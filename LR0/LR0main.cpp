@@ -15,7 +15,7 @@
 #include <stack>
 #include <assert.h>
 
-#define Gfile "/home/yc/Desktop/DP/LR0/G.txt"
+#define Gfile "/home/yc/Desktop/编译原理/LR0/G.txt"
 
 class grammer{
 public:

@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <iostream>
 
-#define Gfile "/home/yc/Desktop/DP/LL1/G.txt"
+#define Gfile "/home/yc/Desktop/编译原理/LL1/G.txt"
 
 class grammer{
 public:
@@ -58,6 +58,7 @@ void derivateFIRST(char);
 
 // FOLLOW集间的依赖关系，用于生成拓扑排序
 bool dep[mxv][mxv] = {0};
+// 入度
 std::map<char,int> in_cnt;
 
 void initFOLLOW(char);
@@ -206,8 +207,10 @@ void initFOLLOW(char s){
         for(int i=(int)g.right.length()-1;i>=0;--i){
             if(!VN.count(g.right[i])) break;    // 是终结符
             if(g.left==g.right[i]) continue;    // 依赖自身
-            dep[charToId[g.left]][charToId[g.right[i]]] = true;
-            ++in_cnt[g.right[i]];   
+            if(!dep[charToId[g.left]][charToId[g.right[i]]]){
+                dep[charToId[g.left]][charToId[g.right[i]]] = true;
+                ++in_cnt[g.right[i]];   
+            }
             if(EPSILON[charToId[g.right[i]]]==0) break;
         }
     }
