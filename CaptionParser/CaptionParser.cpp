@@ -143,6 +143,17 @@ void fillC6(int s, int v)
     nxts[s]['-'] = v;
     nxts[s][' '] = v;
 }
+void fillC7(int s, int v){
+    fillR(s,v);
+    fillN(s,v);
+    nxts[s]['<'] = v;
+    nxts[s]['/'] = v;
+    nxts[s]['i'] = v;
+    nxts[s]['>'] = v;
+    nxts[s][':'] = v;
+    nxts[s][','] = v;
+    nxts[s][' '] = v;
+}
 void initNxts()
 {
     memset(nxts, -1, sizeof(nxts));
@@ -192,6 +203,8 @@ void initNxts()
     cane[7] = true;
     // go from state 8
     nxts[8]['-'] = 16;
+    nxts[8]['\n'] = 11;
+    fillC7(8,5);
     // go from state 9
     cane[9] = true;
     // go from state 10
@@ -225,6 +238,8 @@ void initNxts()
     fillC5(15, 5);
     // go from state 16
     nxts[16]['>'] = 22;
+    nxts[16]['\n'] = 11;
+    fillC5(16,5);
     // go from staet 17
     cane[17] = true;
     nxts[17]['<'] = 4;
