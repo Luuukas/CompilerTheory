@@ -9,7 +9,9 @@
 #include <assert.h>
 #include <iostream>
 
-#define Gfile "/home/yc/Desktop/编译原理/LL1/G.txt"
+#define min(a,b) (a<b?a:b)
+
+#define Gfile "D:\\Doc\\CompilerTheory\\CompilerTheory\\LL1\\G.txt"
 
 class grammer{
 public:
@@ -217,7 +219,79 @@ void initFOLLOW(char s){
     derivateFOLLOW();
 }
 
+int dfn[mxv];
+int low[mxv];
+int cnt = 0;
+bool instack[mxv];
+std::stack<int> TJs;
+std::vector<std::vector<int>> SCv;
+void tarjan(int now){
+    dfn[now] = low[now] = ++cnt;    // 初始化
+    TJs.push(now);
+    instack[now] = true;
+    for(int to=0;to<Vcnt;++to){
+        if(dep[now][to]){    // now->to存在有向边
+            if(!~dfn[to]){    // 判断to是否被搜索过
+                tarjan(to);
+                low[now] = min(low[now], low[to]);
+            }else if(instack[to]){    // 访问过且当前在栈中的点
+                low[now] = min(low[now], dfn[to]);
+            }
+        }
+    }
+    if(dfn[now]==low[now]){
+        std::vector<int> SC;
+        while(now!=TJs.top()){
+            instack[TJs.top()] = false;    // 出栈
+            SC.push_back(TJs.top());
+            TJs.pop();
+        }
+        SC.push_back(TJs.top());
+        TJs.pop();
+        SCv.push_back(SC);
+    }
+}
+
+void tarjan_solve(){
+    memset(dfn,-1,sizeof(dfn));
+    memset(instack,false,sizeof(instack));
+    for(int u=0;u<Vcnt;u++){
+        if(!~dfn[u]){
+            if(VN.count(idToChar[u])){    // 非终结符
+                tarjan(u);
+            }
+        }
+    }
+    for(auto &SC: SCv){
+        for(int u: SC){
+            for(int v: SC){
+                if(dep[u][v]){
+                    dep[u][v] = false;
+                    --in_cnt[idToChar[v]];
+                }
+            }
+        }
+    }
+}
+
+void refill(){
+    for(auto &SC: SCv){
+        std::set<char> sameFOLLOW;
+        for(int u: SC){
+            for(char c: FOLLOW[u]){
+                sameFOLLOW.insert(c);
+            }
+        }
+        for(int u: SC){
+            for(char c: sameFOLLOW){
+                FOLLOW[u].insert(c);
+            }
+        }
+    }
+}
+
 void derivateFOLLOW(){
+    tarjan_solve();
     std::queue<char> q;
     for(auto &e : in_cnt){
         if(e.second==0) q.push(e.first);
@@ -238,6 +312,7 @@ void derivateFOLLOW(){
             }
         }
     }
+    refill();
 }
 
 void derivateSELECT(){
@@ -323,6 +398,7 @@ int main(int argc, const char * argv[]) {
     initFOLLOW(S);
     derivateSELECT();
     printTable();
-    std::cout << analyze("i+i#") << std::endl;
+    std::cout << analyze("a+b#") << std::endl;
+    system("pause");
     return 0;
 }
